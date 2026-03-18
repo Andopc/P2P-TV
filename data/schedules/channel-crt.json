@@ -1,0 +1,134 @@
+[
+  {
+    "start_ts": "2026-03-18T00:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Vintage Documentary \u2013 Episode 1",
+    "content_id": "crt-ep01",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep01.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T01:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Classic Cartoons Block",
+    "content_id": "crt-ep02",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep02.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T02:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Old Western \u2013 Part 1",
+    "content_id": "crt-ep03",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep03.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T03:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Old Western \u2013 Part 2",
+    "content_id": "crt-ep04",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep04.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T04:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Retro Sci-Fi Feature",
+    "content_id": "crt-ep05",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep05.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T05:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Saturday Morning Cartoons",
+    "content_id": "crt-ep06",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep06.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T06:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Nature Series \u2013 Ep 1",
+    "content_id": "crt-ep07",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep07.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T07:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Nature Series \u2013 Ep 2",
+    "content_id": "crt-ep08",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep08.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T08:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Black and White Cinema",
+    "content_id": "crt-ep09",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep09.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T09:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Evening Variety Show",
+    "content_id": "crt-ep10",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep10.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T10:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Late Show Classics",
+    "content_id": "crt-ep11",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep11.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  },
+  {
+    "start_ts": "2026-03-18T11:00:00+00:00",
+    "duration_seconds": 3600,
+    "title": "Overnight Noir Marathon",
+    "content_id": "crt-ep12",
+    "variant": "crt",
+    "magnet": "magnet:?xt=urn:btih:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&dn=crt-ep12.mkv&tr=udp%3A%2F%2Ftracker.example.com%3A1337",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "size_bytes": 314572800,
+    "http_url": ""
+  }
+]

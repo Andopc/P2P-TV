@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile:1
+# ── P2P TV Node helper ────────────────────────────────────────────────────────
+# Same multi-arch base as the hub:
+#   linux/amd64  · linux/arm64  · linux/arm/v7
+FROM python:3.12-slim
+
+RUN groupadd --system p2ptv && useradd --system --gid p2ptv --no-create-home p2ptv
+
+WORKDIR /app
+
+COPY p2ptv_node/requirements.txt ./p2ptv_node/requirements.txt
+RUN pip install --no-cache-dir -r p2ptv_node/requirements.txt
+
+COPY p2ptv_node/ ./p2ptv_node/
+
+RUN mkdir -p /app/cache && chown -R p2ptv:p2ptv /app
+
+USER p2ptv
+
+ENV P2PTV_CACHE_DIR=/app/cache
+
+CMD ["python", "-m", "p2ptv_node.main"]

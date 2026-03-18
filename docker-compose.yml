@@ -1,0 +1,76 @@
+# ── P2P TV – docker-compose.yml ───────────────────────────────────────────────
+# Run on x86 or ARM (Pi 4/5 arm64, Pi 3 arm/v7) without changes:
+#   Docker automatically selects the matching arch from the multi-arch manifests.
+#
+# Quickstart:
+#   cp .env.example .env   # fill in P2PTV_API_KEY (required)
+#   docker compose up -d
+#
+# To override the architecture explicitly (e.g. cross-building):
+#   DOCKER_DEFAULT_PLATFORM=linux/arm64 docker compose build
+
+services:
+
+  # ── Hub (FastAPI) ────────────────────────────────────────────────────────────
+  hub:
+    build:
+      context: .
+      dockerfile: Dockerfile.hub
+    restart: unless-stopped
+    ports:
+      - "${P2PTV_PORT:-8000}:8000"
+    volumes:
+      - ./data:/app/data
+    env_file:
+      - .env
+    environment:
+      P2PTV_DATA_DIR: /app/data
+    depends_on:
+      - qbittorrent
+    healthcheck:
+      # Note: requires P2PTV_API_KEY to be set in .env
+      test: >
+        sh -c 'curl -sf -H "Authorization: Bearer $$P2PTV_API_KEY"
+        http://localhost:8000/api/v1/health || exit 1'
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ── qBittorrent (torrent seeder / downloader) ────────────────────────────────
+  # linuxserver/qbittorrent publishes manifests for:
+  #   linux/amd64 · linux/arm64 · linux/arm/v7
+  # WebUI is intentionally NOT published on the host network.
+  # Access it via: ssh -L 8090:localhost:8090 <your-host>
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    restart: unless-stopped
+    environment:
+      PUID: "${PUID:-1000}"
+      PGID: "${PGID:-1000}"
+      TZ: "${TZ:-Etc/UTC}"
+      WEBUI_PORT: "8090"
+    volumes:
+      - ./data/torrents:/downloads
+      - ./qbt-config:/config
+    expose:
+      - "8090"   # reachable by hub/node on the internal network; NOT published to host
+
+  # ── Node helper (prefetch + seed) ───────────────────────────────────────────
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    restart: unless-stopped
+    volumes:
+      - ./data/torrents:/app/cache
+    env_file:
+      - .env
+    environment:
+      P2PTV_CACHE_DIR: /app/cache
+      QBT_URL: "http://qbittorrent:8090"
+    depends_on:
+      hub:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_started
