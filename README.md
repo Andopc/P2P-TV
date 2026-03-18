@@ -238,16 +238,87 @@ mpv --http-header-fields="Authorization: Bearer my-local-secret" \
 
 ---
 
-## After setup: add your first content
+## Play a channel on your PC (no FieldStation42 needed)
 
-### The quick way – `tools/add_content.py`
+The fastest way to get a channel running right now — two commands to register
+your videos, one command to start playing:
+
+### Step 1 – Register your videos
+
+```bash
+source .venv/bin/activate   # activate the venv if not already active
+
+# First video – starts immediately
+python tools/add_content.py /path/to/episode1.mkv --title "My Show – Ep 1"
+
+# Second video – automatically scheduled to start right after Ep 1 ends
+python tools/add_content.py /path/to/episode2.mkv --title "My Show – Ep 2"
+```
+
+Each call:
+- Computes SHA-256 and file size automatically
+- Auto-detects duration via ffprobe (or prompts you for it)
+- Copies the file to `data/content/` if it isn't there already
+- Schedules the entry back-to-back after any existing entries on the channel
+
+### Step 2 – Play the channel
+
+```bash
+python tools/play_channel.py channel-1
+```
+
+This finds the currently-airing video, seeks into it at the right position, then
+chains any upcoming videos — just like a real TV channel.
+
+Output looks like:
+
+```
+Channel: channel-1
+Time:    2026-03-18 14:32:00 UTC
+
+▶ NOW  My Show – Ep 1  [45m 00s]  (seek 32m 15s in)
+        episode1.mkv
+   2.   My Show – Ep 2  [52m 00s]
+        episode2.mkv
+
+Launching mpv …
+```
+
+### Useful flags
+
+| Flag | What it does |
+|---|---|
+| `--list` | Show what would play without launching mpv |
+| `--from-start` | Play from the very beginning, ignoring the current time |
+| `--loop` | Loop continuously after the last video |
+
+```bash
+# Preview what's on without launching mpv:
+python tools/play_channel.py channel-1 --list
+
+# Play from the beginning and loop forever:
+python tools/play_channel.py channel-1 --from-start --loop
+```
+
+### Install mpv (if needed)
+
+| Platform | Command |
+|---|---|
+| Debian/Ubuntu | `sudo apt install mpv` |
+| Fedora/RHEL | `sudo dnf install mpv` |
+| Arch | `sudo pacman -S mpv` |
+| macOS (Homebrew) | `brew install mpv` |
+| Windows | <https://mpv.io/installation/> |
+
+---
+
+## After setup: add more content
+
+### `tools/add_content.py`
 
 Drop a video file anywhere you like (or directly into `data/content/`), then run:
 
 ```bash
-# Make sure your venv is active
-source .venv/bin/activate
-
 python tools/add_content.py path/to/my-video.mkv \
     --title "My Show – Episode 1" \
     --channel channel-1
@@ -257,7 +328,7 @@ The script will:
 1. Compute the SHA-256 digest and file size for you
 2. Auto-detect the duration via ffprobe (falls back to prompting you for it)
 3. Copy the file to `data/content/` if it's not already there
-4. Append a new schedule entry to `data/schedules/channel-1.json` starting **now**
+4. Schedule the entry after the last existing entry on the channel (back-to-back)
 5. Print a ready-to-paste `curl` and `mpv` command to verify and play
 
 You can also set an exact future start time:
@@ -284,7 +355,7 @@ positional arguments:
 options:
   --channel, -c         Channel ID (default: channel-1)
   --title,   -t         Programme title (default: filename stem)
-  --start,   -s         ISO-8601 start time (default: now)
+  --start,   -s         ISO-8601 start time (default: after last entry, or now)
   --duration,-d         Duration in seconds (default: ffprobe auto-detect)
   --magnet,  -m         BitTorrent magnet URI (optional)
   --data-dir            Path to the data/ directory (auto-detected)

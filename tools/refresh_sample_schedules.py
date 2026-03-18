@@ -53,6 +53,7 @@ def refresh(schedule_file: Path) -> int:
     updated = []
     for entry, orig_start in zip(entries, orig_starts):
         new_start = orig_start + delta
+        # http_url is always cleared: the hub fills it in dynamically at query time.
         updated.append({**entry, "start_ts": new_start.isoformat(), "http_url": ""})
 
     with schedule_file.open("w") as fh:

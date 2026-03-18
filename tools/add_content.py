@@ -126,7 +126,8 @@ def main(argv: list[str] | None = None) -> None:
         default=None,
         help=(
             "Start time as ISO-8601 string (e.g. '2026-03-20T20:00:00+00:00'). "
-            "Defaults to now (UTC)."
+            "Defaults to immediately after the last scheduled entry ends, "
+            "or now (UTC) if the channel schedule is empty."
         ),
     )
     parser.add_argument(
@@ -181,6 +182,15 @@ def main(argv: list[str] | None = None) -> None:
 
     title = args.title if args.title else stem.replace("-", " ").replace("_", " ")
 
+    # ── load existing schedule (needed for start_ts defaulting) ─────────────
+
+    schedule_file = schedules_dir / f"{args.channel}.json"
+    if schedule_file.exists():
+        with schedule_file.open() as fh:
+            schedule: list[dict] = json.load(fh)
+    else:
+        schedule = []
+
     # ── start_ts ────────────────────────────────────────────────────────────
 
     if args.start:
@@ -190,7 +200,26 @@ def main(argv: list[str] | None = None) -> None:
             print(f"Error: invalid --start value: {exc}", file=sys.stderr)
             sys.exit(1)
     else:
-        start_ts = datetime.now(timezone.utc).replace(second=0, microsecond=0)
+        # Round helper: truncate to the minute for human-readable timestamps.
+        def _round_to_minute(dt: datetime) -> datetime:
+            return dt.replace(second=0, microsecond=0)
+
+        # If there are existing entries for *other* content, default to after
+        # the last one ends so videos are scheduled back-to-back automatically.
+        other_entries = [e for e in schedule if e.get("content_id") != content_id]
+        if other_entries:
+            last = max(other_entries, key=lambda e: e["start_ts"])
+            last_start = datetime.fromisoformat(last["start_ts"])
+            if last_start.tzinfo is None:
+                last_start = last_start.replace(tzinfo=timezone.utc)
+            last_end = last_start + timedelta(seconds=int(last["duration_seconds"]))
+            # Start immediately after the last entry, but not in the past.
+            # Round both candidates to the minute for clean timestamps.
+            start_ts = _round_to_minute(
+                max(last_end, datetime.now(timezone.utc))
+            )
+        else:
+            start_ts = _round_to_minute(datetime.now(timezone.utc))
 
     # ── duration ────────────────────────────────────────────────────────────
 
@@ -234,16 +263,7 @@ def main(argv: list[str] | None = None) -> None:
         "http_url": "",  # filled in dynamically by the hub at query time
     }
 
-    # ── load, append, save ────────────────────────────────────────────────────
-
-    schedule_file = schedules_dir / f"{args.channel}.json"
-    if schedule_file.exists():
-        with schedule_file.open() as fh:
-            schedule: list[dict] = json.load(fh)
-    else:
-        schedule = []
-
-    # Deduplicate by content_id: replace existing entry if found
+    # ── upsert entry into schedule, sort, save ───────────────────────────────
     existing_idx = next(
         (i for i, e in enumerate(schedule) if e.get("content_id") == content_id),
         None,
