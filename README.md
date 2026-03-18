@@ -60,6 +60,321 @@ docker buildx build --platform linux/arm64 -f Dockerfile.hub -t p2ptv-hub:arm64 
 
 ## Quickstart
 
+Choose the path that fits your situation:
+
+| Path | Best for |
+|---|---|
+| [**A – Local PC (Python only)**](#quickstart-a--local-pc-python-only-no-docker) | Trying it out on Windows / macOS / Linux without Docker |
+| [**B – Docker Compose**](#quickstart-b--docker-compose-recommended-for-always-on-hosting) | Always-on home server, Raspberry Pi, VPS |
+
+---
+
+## Quickstart A – Local PC (Python only, no Docker)
+
+Run just the hub directly on your machine in a few minutes.  No Docker, no qBittorrent
+needed to get started — you can serve content files straight from your hard drive.
+
+### Linux x86-64 – one-command setup
+
+Clone the repo and run the setup script.  It handles everything automatically:
+
+```bash
+git clone https://github.com/Andopc/P2P-TV.git
+cd P2P-TV
+chmod +x setup_linux.sh
+./setup_linux.sh
+```
+
+The script:
+- Checks for Python 3.11+ and prints distro-specific install instructions if it is missing
+- Creates a `.venv/` virtual environment
+- Installs hub dependencies
+- Copies `.env.example` → `.env` and auto-generates a random `P2PTV_API_KEY`
+- Creates the `data/content/` directory
+
+When it finishes it prints the exact commands to start the hub and verify it works.
+Then jump to [Step 5 – Add some content](#step-5--add-some-content-optional-but-recommended)
+below if you want to serve your own video files.
+
+> **All other platforms** (Windows, macOS) or if you prefer step-by-step instructions:
+> continue with the manual steps below.
+
+---
+
+### Prerequisites
+
+- **Python 3.11 or newer**
+  - Windows: download from <https://www.python.org/downloads/> (tick "Add Python to PATH")
+  - macOS: `brew install python` or the Python.org installer
+  - Linux (Debian/Ubuntu): `sudo apt install python3.11 python3.11-venv`
+  - Linux (Fedora/RHEL): `sudo dnf install python3.11`
+  - Linux (Arch): `sudo pacman -S python`
+- **git** (to clone the repo)
+  - Windows: <https://git-scm.com/download/win>
+  - macOS: `brew install git` or Xcode Command Line Tools (`xcode-select --install`)
+  - Linux: `sudo apt install git` / `sudo dnf install git` / `sudo pacman -S git`
+
+### Step 1 – Clone the repo
+
+```bash
+git clone https://github.com/Andopc/P2P-TV.git
+cd P2P-TV
+```
+
+### Step 2 – Create and activate a virtual environment
+
+**macOS / Linux**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+**Windows (Command Prompt)**
+```bat
+python -m venv .venv
+.venv\Scripts\activate.bat
+```
+
+**Windows (PowerShell)**
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+### Step 3 – Install hub dependencies
+
+```bash
+pip install -r p2ptv_hub/requirements.txt
+```
+
+### Step 4 – Create your `.env` file
+
+```bash
+# macOS / Linux
+cp .env.example .env
+
+# Windows
+copy .env.example .env
+```
+
+Open `.env` in any text editor and set **at minimum**:
+
+```dotenv
+# Pick any password-like string (keep it secret)
+P2PTV_API_KEY=my-local-secret
+
+# For local-only use, localhost is fine
+P2PTV_BASE_URL=http://localhost:8000
+```
+
+### Step 5 – Add some content (optional but recommended)
+
+The hub serves files from `data/content/`.  Drop any video file in there, for example:
+
+```
+data/
+└── content/
+    └── my-show-ep1.mkv
+```
+
+The filename stem (`my-show-ep1`) becomes the `content_id` you reference in schedules.
+
+Sample channel and schedule files are already included in `data/` so the hub will start
+with two placeholder channels out of the box.
+
+### Step 6 – Start the hub
+
+```bash
+# macOS / Linux
+uvicorn p2ptv_hub.main:app --host 0.0.0.0 --port 8000
+
+# Windows – same command, make sure your venv is active
+uvicorn p2ptv_hub.main:app --host 0.0.0.0 --port 8000
+```
+
+You should see output like:
+```
+INFO:     Started server process [...]
+INFO:     Uvicorn running on http://0.0.0.0:8000
+```
+
+### Step 7 – Verify it works
+
+Open a new terminal (keep uvicorn running in the first one).
+
+**macOS / Linux**
+```bash
+# Replace "my-local-secret" with the value you set for P2PTV_API_KEY in .env
+export KEY=my-local-secret
+curl -H "Authorization: Bearer $KEY" http://localhost:8000/api/v1/health
+# {"status":"ok"}
+
+curl -H "Authorization: Bearer $KEY" http://localhost:8000/api/v1/channels
+```
+
+**Windows (PowerShell)**
+```powershell
+# Replace "my-local-secret" with the value you set for P2PTV_API_KEY in .env
+$KEY = "my-local-secret"
+Invoke-RestMethod -Uri http://localhost:8000/api/v1/health `
+  -Headers @{ Authorization = "Bearer $KEY" }
+
+Invoke-RestMethod -Uri http://localhost:8000/api/v1/channels `
+  -Headers @{ Authorization = "Bearer $KEY" }
+```
+
+Or just open <http://localhost:8000/docs> in your browser to explore the interactive
+API docs (click the padlock icon → enter your API key as a Bearer token).
+
+### Step 8 – Play content with mpv
+
+Replace `my-local-secret` with your `P2PTV_API_KEY` and `my-show-ep1` with the stem of
+the file you placed in `data/content/`:
+
+```bash
+mpv --http-header-fields="Authorization: Bearer my-local-secret" \
+    http://localhost:8000/api/v1/content/my-show-ep1/file
+```
+
+---
+
+## Play a channel on your PC (no FieldStation42 needed)
+
+The fastest way to get a channel running right now — two commands to register
+your videos, one command to start playing:
+
+### Step 1 – Register your videos
+
+```bash
+source .venv/bin/activate   # activate the venv if not already active
+
+# First video – starts immediately
+python tools/add_content.py /path/to/episode1.mkv --title "My Show – Ep 1"
+
+# Second video – automatically scheduled to start right after Ep 1 ends
+python tools/add_content.py /path/to/episode2.mkv --title "My Show – Ep 2"
+```
+
+Each call:
+- Computes SHA-256 and file size automatically
+- Auto-detects duration via ffprobe (or prompts you for it)
+- Copies the file to `data/content/` if it isn't there already
+- Schedules the entry back-to-back after any existing entries on the channel
+
+### Step 2 – Play the channel
+
+```bash
+python tools/play_channel.py channel-1
+```
+
+This finds the currently-airing video, seeks into it at the right position, then
+chains any upcoming videos — just like a real TV channel.
+
+Output looks like:
+
+```
+Channel: channel-1
+Time:    2026-03-18 14:32:00 UTC
+
+▶ NOW  My Show – Ep 1  [45m 00s]  (seek 32m 15s in)
+        episode1.mkv
+   2.   My Show – Ep 2  [52m 00s]
+        episode2.mkv
+
+Launching mpv …
+```
+
+### Useful flags
+
+| Flag | What it does |
+|---|---|
+| `--list` | Show what would play without launching mpv |
+| `--from-start` | Play from the very beginning, ignoring the current time |
+| `--loop` | Loop continuously after the last video |
+
+```bash
+# Preview what's on without launching mpv:
+python tools/play_channel.py channel-1 --list
+
+# Play from the beginning and loop forever:
+python tools/play_channel.py channel-1 --from-start --loop
+```
+
+### Install mpv (if needed)
+
+| Platform | Command |
+|---|---|
+| Debian/Ubuntu | `sudo apt install mpv` |
+| Fedora/RHEL | `sudo dnf install mpv` |
+| Arch | `sudo pacman -S mpv` |
+| macOS (Homebrew) | `brew install mpv` |
+| Windows | <https://mpv.io/installation/> |
+
+---
+
+## After setup: add more content
+
+### `tools/add_content.py`
+
+Drop a video file anywhere you like (or directly into `data/content/`), then run:
+
+```bash
+python tools/add_content.py path/to/my-video.mkv \
+    --title "My Show – Episode 1" \
+    --channel channel-1
+```
+
+The script will:
+1. Compute the SHA-256 digest and file size for you
+2. Auto-detect the duration via ffprobe (falls back to prompting you for it)
+3. Copy the file to `data/content/` if it's not already there
+4. Schedule the entry after the last existing entry on the channel (back-to-back)
+5. Print a ready-to-paste `curl` and `mpv` command to verify and play
+
+You can also set an exact future start time:
+
+```bash
+python tools/add_content.py my-video.mkv \
+    --channel channel-1 \
+    --title "My Show – Episode 1" \
+    --start "2026-04-01T20:00:00+00:00" \
+    --duration 1800
+```
+
+Full option list:
+
+```
+usage: add_content.py [-h] [--channel CHANNEL] [--title TITLE]
+                       [--start START] [--duration DURATION]
+                       [--magnet MAGNET] [--data-dir DATA_DIR]
+                       video_file
+
+positional arguments:
+  video_file            Path to the video file to register.
+
+options:
+  --channel, -c         Channel ID (default: channel-1)
+  --title,   -t         Programme title (default: filename stem)
+  --start,   -s         ISO-8601 start time (default: after last entry, or now)
+  --duration,-d         Duration in seconds (default: ffprobe auto-detect)
+  --magnet,  -m         BitTorrent magnet URI (optional)
+  --data-dir            Path to the data/ directory (auto-detected)
+```
+
+### Refreshing sample schedule dates
+
+The two built-in sample channels (`channel-1`, `channel-crt`) ship with schedule
+entries anchored to a specific date.  `setup_linux.sh` rolls them to **today**
+automatically.  If you want to refresh them again manually:
+
+```bash
+python tools/refresh_sample_schedules.py
+```
+
+---
+
+## Quickstart B – Docker Compose (recommended for always-on hosting)
+
 ### 1. Prerequisites
 
 - Docker + Docker Compose v2 (`docker compose` command)
