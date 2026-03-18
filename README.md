@@ -238,6 +238,70 @@ mpv --http-header-fields="Authorization: Bearer my-local-secret" \
 
 ---
 
+## After setup: add your first content
+
+### The quick way – `tools/add_content.py`
+
+Drop a video file anywhere you like (or directly into `data/content/`), then run:
+
+```bash
+# Make sure your venv is active
+source .venv/bin/activate
+
+python tools/add_content.py path/to/my-video.mkv \
+    --title "My Show – Episode 1" \
+    --channel channel-1
+```
+
+The script will:
+1. Compute the SHA-256 digest and file size for you
+2. Auto-detect the duration via ffprobe (falls back to prompting you for it)
+3. Copy the file to `data/content/` if it's not already there
+4. Append a new schedule entry to `data/schedules/channel-1.json` starting **now**
+5. Print a ready-to-paste `curl` and `mpv` command to verify and play
+
+You can also set an exact future start time:
+
+```bash
+python tools/add_content.py my-video.mkv \
+    --channel channel-1 \
+    --title "My Show – Episode 1" \
+    --start "2026-04-01T20:00:00+00:00" \
+    --duration 1800
+```
+
+Full option list:
+
+```
+usage: add_content.py [-h] [--channel CHANNEL] [--title TITLE]
+                       [--start START] [--duration DURATION]
+                       [--magnet MAGNET] [--data-dir DATA_DIR]
+                       video_file
+
+positional arguments:
+  video_file            Path to the video file to register.
+
+options:
+  --channel, -c         Channel ID (default: channel-1)
+  --title,   -t         Programme title (default: filename stem)
+  --start,   -s         ISO-8601 start time (default: now)
+  --duration,-d         Duration in seconds (default: ffprobe auto-detect)
+  --magnet,  -m         BitTorrent magnet URI (optional)
+  --data-dir            Path to the data/ directory (auto-detected)
+```
+
+### Refreshing sample schedule dates
+
+The two built-in sample channels (`channel-1`, `channel-crt`) ship with schedule
+entries anchored to a specific date.  `setup_linux.sh` rolls them to **today**
+automatically.  If you want to refresh them again manually:
+
+```bash
+python tools/refresh_sample_schedules.py
+```
+
+---
+
 ## Quickstart B – Docker Compose (recommended for always-on hosting)
 
 ### 1. Prerequisites

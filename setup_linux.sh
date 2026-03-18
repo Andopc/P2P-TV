@@ -118,7 +118,13 @@ info "Creating data/content/ directory …"
 mkdir -p data/content
 success "data/content/ is ready.  Drop video files here to serve them."
 
-# ── 6. Done – print run instructions ─────────────────────────────────────────
+# ── 6. Roll sample schedule dates to today ────────────────────────────────────
+
+info "Rolling sample schedule dates to today …"
+"$PYTHON" tools/refresh_sample_schedules.py
+success "Sample schedules updated – /api/v1/channels/<id>/schedule will show today's entries."
+
+# ── 7. Done – print run instructions ─────────────────────────────────────────
 
 echo ""
 success "Setup complete!  Next steps:"
@@ -136,7 +142,10 @@ echo ""
 echo "  4. Browse the interactive API docs:"
 echo "       ${CYAN}http://localhost:8000/docs${NC}"
 echo ""
-echo "  5. Play a file with mpv:"
+echo "  5. Add your own content file to the schedule:"
+echo "       ${CYAN}python tools/add_content.py data/content/my-video.mkv --title \"My Video\"${NC}"
+echo ""
+echo "  6. Play a file with mpv:"
 echo "       ${CYAN}mpv --http-header-fields=\"Authorization: Bearer ${API_KEY_HINT}\" \\"
 echo "           http://localhost:8000/api/v1/content/<content_id>/file${NC}"
 echo ""
