@@ -74,16 +74,45 @@ Choose the path that fits your situation:
 Run just the hub directly on your machine in a few minutes.  No Docker, no qBittorrent
 needed to get started — you can serve content files straight from your hard drive.
 
+### Linux x86-64 – one-command setup
+
+Clone the repo and run the setup script.  It handles everything automatically:
+
+```bash
+git clone https://github.com/Andopc/P2P-TV.git
+cd P2P-TV
+chmod +x setup_linux.sh
+./setup_linux.sh
+```
+
+The script:
+- Checks for Python 3.11+ and prints distro-specific install instructions if it is missing
+- Creates a `.venv/` virtual environment
+- Installs hub dependencies
+- Copies `.env.example` → `.env` and auto-generates a random `P2PTV_API_KEY`
+- Creates the `data/content/` directory
+
+When it finishes it prints the exact commands to start the hub and verify it works.
+Then jump to [Step 5 – Add some content](#step-5--add-some-content-optional-but-recommended)
+below if you want to serve your own video files.
+
+> **All other platforms** (Windows, macOS) or if you prefer step-by-step instructions:
+> continue with the manual steps below.
+
+---
+
 ### Prerequisites
 
 - **Python 3.11 or newer**
   - Windows: download from <https://www.python.org/downloads/> (tick "Add Python to PATH")
   - macOS: `brew install python` or the Python.org installer
   - Linux (Debian/Ubuntu): `sudo apt install python3.11 python3.11-venv`
+  - Linux (Fedora/RHEL): `sudo dnf install python3.11`
+  - Linux (Arch): `sudo pacman -S python`
 - **git** (to clone the repo)
   - Windows: <https://git-scm.com/download/win>
   - macOS: `brew install git` or Xcode Command Line Tools (`xcode-select --install`)
-  - Linux: `sudo apt install git`
+  - Linux: `sudo apt install git` / `sudo dnf install git` / `sudo pacman -S git`
 
 ### Step 1 – Clone the repo
 
