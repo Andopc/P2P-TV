@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1
+# ── P2P TV Hub ────────────────────────────────────────────────────────────────
+# Base image publishes multi-arch manifests:
+#   linux/amd64  (standard x86-64 server / desktop)
+#   linux/arm64  (Raspberry Pi 4 / Pi 5 running 64-bit OS)
+#   linux/arm/v7 (Raspberry Pi 3 / older Pis running 32-bit OS)
+# Build for the host arch:  docker compose build hub
+# Cross-build for arm64:    docker buildx build --platform linux/arm64 -f Dockerfile.hub .
+FROM python:3.12-slim
+
+# Non-root user for least-privilege operation
+RUN groupadd --system p2ptv && useradd --system --gid p2ptv --no-create-home p2ptv
+
+WORKDIR /app
+
+# Install dependencies before copying source to maximise layer cache hits.
+COPY p2ptv_hub/requirements.txt ./p2ptv_hub/requirements.txt
+RUN pip install --no-cache-dir -r p2ptv_hub/requirements.txt
+
+# Copy application source
+COPY p2ptv_hub/ ./p2ptv_hub/
+
+# Data directory is expected to be bind-mounted at runtime.
+# We create the directory so the container starts even without a mount.
+RUN mkdir -p /app/data/schedules /app/data/content \
+    && chown -R p2ptv:p2ptv /app
+
+USER p2ptv
+
+EXPOSE 8000
+
+# Uvicorn – workers default to 1 for simplicity; override via UV_WORKERS env var.
+ENV P2PTV_DATA_DIR=/app/data
+
+CMD ["sh", "-c", \
+     "uvicorn p2ptv_hub.main:app \
+       --host 0.0.0.0 \
+       --port 8000 \
+       --workers ${UV_WORKERS:-1} \
+       --proxy-headers"]

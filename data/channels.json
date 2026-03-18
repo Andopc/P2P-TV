@@ -1,0 +1,14 @@
+[
+  {
+    "id": "channel-1",
+    "name": "P2P TV – Handheld",
+    "description": "SD AV1 content optimised for Steam Deck (16:9, ~720p handheld profile).",
+    "variant": "handheld"
+  },
+  {
+    "id": "channel-crt",
+    "name": "P2P TV – CRT Classics",
+    "description": "4:3 SD content for Pi-connected CRT or vintage-display setups.",
+    "variant": "crt"
+  }
+]
